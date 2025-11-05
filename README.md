@@ -1,7 +1,18 @@
-# GramJS
+# GramJS with HTTP Proxy Support
+
+> **This is a fork of [gram-js/gramjs](https://github.com/gram-js/gramjs)** with added HTTP/HTTPS proxy support.
 
 A Telegram client written in JavaScript for Node.js and browsers, with its core being based on
 [Telethon](https://github.com/LonamiWebs/Telethon).
+
+## ✨ What's Different in This Fork
+
+- ✅ **Full HTTP/HTTPS Proxy Support** via CONNECT method
+- ✅ **HTTP Proxy Authentication** (username/password)
+- ✅ Maintains all original gramjs functionality
+- ✅ Regular updates from upstream
+
+> If you don't need HTTP proxy support, use the [original gramjs](https://github.com/gram-js/gramjs) instead.
 
 ## How to get started
 
@@ -9,10 +20,17 @@ Here you'll learn how to obtain necessary information to create telegram applica
 
 > **Note** that if you want to use a GramJS inside of a browser, refer to [this instructions](https://gram.js.org/introduction/advanced-installation).
 
-Install GramJS:
+Install this fork:
 
 ```bash
-$ npm i telegram
+$ npm install @kirill-kopylov/telegram
+```
+
+Or if migrating from original gramjs:
+
+```bash
+$ npm uninstall telegram
+$ npm install @kirill-kopylov/telegram
 ```
 
 After installation, you'll need to obtain an API ID and hash:
@@ -28,8 +46,8 @@ When you've successfully created the application, change `apiId` and `apiHash` o
 Then run this code to send a message to yourself.
 
 ```javascript
-import { TelegramClient } from "telegram";
-import { StringSession } from "telegram/sessions";
+import { TelegramClient } from "@kirill-kopylov/telegram";
+import { StringSession } from "@kirill-kopylov/telegram/sessions";
 import readline from "readline";
 
 const apiId = 123456;
@@ -93,6 +111,64 @@ You can also use the helpful script `generate_webpack.js`
 node generate_webpack.js
 ```
 
+## Using Proxies
+
+This fork supports all proxy types from the original gramjs, plus enhanced HTTP/HTTPS proxy support:
+
+### HTTP/HTTPS Proxy ⭐ (Enhanced in This Fork)
+
+The HTTP proxy implementation uses the standard CONNECT method and supports authentication:
+
+```javascript
+const client = new TelegramClient(stringSession, apiId, apiHash, {
+  proxy: {
+    ip: "proxy.example.com",
+    port: 8080,
+    httpProxy: true,
+    // Optional authentication
+    username: "user",
+    password: "pass",
+    timeout: 10, // seconds
+  },
+});
+```
+
+### SOCKS4/5 Proxy
+
+```javascript
+const client = new TelegramClient(stringSession, apiId, apiHash, {
+  proxy: {
+    ip: "proxy.example.com",
+    port: 1080,
+    socksType: 5, // 4 or 5
+    username: "user", // optional
+    password: "pass", // optional
+    timeout: 10,
+  },
+});
+```
+
+### MTProxy
+
+```javascript
+const client = new TelegramClient(stringSession, apiId, apiHash, {
+  proxy: {
+    ip: "mtproxy.example.com",
+    port: 443,
+    secret: "your_secret_here",
+    MTProxy: true,
+  },
+});
+```
+
+**Key Features:**
+- Standard CONNECT method (works with most HTTP proxies)
+- Optional authentication (Basic Auth)
+- Configurable timeout
+- Full TypeScript support
+
+For more examples, check the [`examples/httpProxyExample.ts`](examples/httpProxyExample.ts) file.
+
 ## Calling the raw API
 
 To use raw telegram API methods use [invoke function](https://gram.js.org/beta/classes/TelegramClient.html#invoke).
@@ -109,6 +185,18 @@ For more advanced documentation refer to [gram.js.org/beta](https://gram.js.org/
 
 If your ISP is blocking Telegram, you can check [My ISP blocks Telegram. How can I still use GramJS?](https://gist.github.com/SecurityAndStuff/7cd04b28216c49b73b30a64d56d630ab)
 
-## Ask a question
+## Contributing
 
-If you have any questions about GramJS, feel free to open an issue or ask directly in our telegram group - [@GramJSChat](https://t.me/gramjschat).
+This is a fork maintained by [@kirill-kopylov](https://github.com/kirill-kopylov).
+
+For issues specific to HTTP proxy functionality, please [open an issue here](https://github.com/kirill-kopylov/gramjs-http-proxy-support/issues).
+
+For general gramjs questions, refer to the [original project](https://github.com/gram-js/gramjs) or their telegram group [@GramJSChat](https://t.me/gramjschat).
+
+## Syncing with Upstream
+
+This fork is regularly synced with the [original gramjs repository](https://github.com/gram-js/gramjs) to include latest updates and bug fixes.
+
+## License
+
+MIT (same as original gramjs)

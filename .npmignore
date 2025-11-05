@@ -1,24 +1,38 @@
-/node_modules/
-/.vscode/
-/.idea/
-# Generated code
-/docs/
+# Исходники TypeScript (они не нужны в npm пакете)
+gramjs/
+__tests__/
+examples/
 
-# User session
-*.session
-usermedia/
+# Конфигурация
+tsconfig.json
+webpack.config.js
+babel.config.js
+jest.config.js
+.bablerc
+.prettierrc.json
+.prettierignore
+.editorconfig
 
-# Quick tests should live in this file
-example.js
+# Скрипты разработки
+scripts/
+publish_npm.js
+generate_webpack.js
+prepare_dist.sh
+npmpublish.bat
+type_doc.js
 
-# dotenv
-.env
+# Git
+.git/
+.github/
+.gitignore
 
-settings
+# Документация для разработчиков
+PUBLISHING.md
+QUICK_START.md
 
-/browser/
-
-.babelrc
-.eslintignore
-.eslintrc.json
-/examples/
+# Временные файлы
+tempBrowser/
+browser/
+node_modules/
+*.log
+.DS_Store

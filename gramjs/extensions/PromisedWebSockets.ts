@@ -1,6 +1,7 @@
 import { w3cwebsocket } from "websocket";
 import { Mutex } from "async-mutex";
 import { isBrowser } from "../platform";
+import { ProxyInterface } from "../network/connection/TCPMTProxy";
 
 const mutex = new Mutex();
 
@@ -14,7 +15,9 @@ export class PromisedWebSockets {
     private client: w3cwebsocket | undefined;
     private website?: string;
 
-    constructor() {
+    constructor(proxy?: ProxyInterface) {
+        // Браузеры не поддерживают программную настройку прокси для WebSocket
+        // Прокси настраивается на уровне системы/браузера
         this.client = undefined;
         this.stream = Buffer.alloc(0);
 

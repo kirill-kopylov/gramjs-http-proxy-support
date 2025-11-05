@@ -69,7 +69,8 @@ export interface TelegramClientParams {
      */
     reconnectRetries?: number;
     /**
-     * Experimental proxy to be used for the connection. (only supports MTProxies)
+     * Proxy to be used for the connection.
+     * Supports MTProxy, SOCKS4/5, and HTTP/HTTPS proxies.
      */
     proxy?: ProxyInterface;
     /**

@@ -23,7 +23,11 @@ export type SocksProxyType = BasicProxyInterface & {
     socksType: 4 | 5;
 };
 
-export type ProxyInterface = MTProxyType | SocksProxyType;
+export type HttpProxyType = BasicProxyInterface & {
+    httpProxy: true;
+};
+
+export type ProxyInterface = MTProxyType | SocksProxyType | HttpProxyType;
 
 class MTProxyIO {
     header?: Buffer = undefined;

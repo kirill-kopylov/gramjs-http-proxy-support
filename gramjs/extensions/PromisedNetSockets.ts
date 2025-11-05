@@ -1,10 +1,12 @@
 import * as net from "./net";
+import * as http from "http";
 import { SocksClient } from "./socks";
 
 import { Mutex } from "async-mutex";
 import {
     ProxyInterface,
     SocksProxyType,
+    HttpProxyType,
 } from "../network/connection/TCPMTProxy";
 
 const mutex = new Mutex();
@@ -17,7 +19,7 @@ export class PromisedNetSockets {
     private stream: Buffer;
     private canRead?: boolean | Promise<boolean>;
     private resolveRead: ((value?: any) => void) | undefined;
-    private proxy?: SocksProxyType;
+    private proxy?: SocksProxyType | HttpProxyType;
 
     constructor(proxy?: ProxyInterface) {
         this.client = undefined;
@@ -26,12 +28,23 @@ export class PromisedNetSockets {
         if (proxy) {
             // we only want to use this when it's not an MTProto proxy.
             if (!("MTProxy" in proxy)) {
-                if (!proxy.ip || !proxy.port || !proxy.socksType) {
-                    throw new Error(
-                        `Invalid sockets params: ip=${proxy.ip}, port=${proxy.port}, socksType=${proxy.socksType}`
-                    );
+                if ("httpProxy" in proxy) {
+                    // HTTP прокси
+                    if (!proxy.ip || !proxy.port) {
+                        throw new Error(
+                            `Invalid HTTP proxy params: ip=${proxy.ip}, port=${proxy.port}`
+                        );
+                    }
+                    this.proxy = proxy;
+                } else if ("socksType" in proxy) {
+                    // SOCKS прокси
+                    if (!proxy.ip || !proxy.port || !proxy.socksType) {
+                        throw new Error(
+                            `Invalid SOCKS proxy params: ip=${proxy.ip}, port=${proxy.port}, socksType=${proxy.socksType}`
+                        );
+                    }
+                    this.proxy = proxy;
                 }
-                this.proxy = proxy;
             }
         }
     }
@@ -89,24 +102,31 @@ export class PromisedNetSockets {
         this.stream = Buffer.alloc(0);
         let connected = false;
         if (this.proxy) {
-            const info = await SocksClient.createConnection({
-                proxy: {
-                    host: this.proxy.ip,
-                    port: this.proxy.port,
-                    type: this.proxy.socksType,
-                    userId: this.proxy.username,
-                    password: this.proxy.password,
-                },
+            if ("httpProxy" in this.proxy) {
+                // HTTP прокси через CONNECT метод
+                this.client = await this._connectViaHttpProxy(ip, port, this.proxy);
+                connected = true;
+            } else if ("socksType" in this.proxy) {
+                // SOCKS прокси
+                const info = await SocksClient.createConnection({
+                    proxy: {
+                        host: this.proxy.ip,
+                        port: this.proxy.port,
+                        type: this.proxy.socksType,
+                        userId: this.proxy.username,
+                        password: this.proxy.password,
+                    },
 
-                command: "connect",
-                timeout: (this.proxy.timeout || 5) * 1000,
-                destination: {
-                    host: ip,
-                    port: port,
-                },
-            });
-            this.client = info.socket;
-            connected = true;
+                    command: "connect",
+                    timeout: (this.proxy.timeout || 5) * 1000,
+                    destination: {
+                        host: ip,
+                        port: port,
+                    },
+                });
+                this.client = info.socket;
+                connected = true;
+            }
         } else {
             this.client = new net.Socket();
         }
@@ -173,6 +193,59 @@ export class PromisedNetSockets {
             });
         }
     }
+
+    /**
+     * Подключение через HTTP прокси используя метод CONNECT
+     */
+    private async _connectViaHttpProxy(
+        targetHost: string,
+        targetPort: number,
+        proxy: HttpProxyType
+    ): Promise<net.Socket> {
+        return new Promise((resolve, reject) => {
+            const timeout = (proxy.timeout || 5) * 1000;
+            
+            const proxyReq = http.request({
+                host: proxy.ip,
+                port: proxy.port,
+                method: "CONNECT",
+                path: `${targetHost}:${targetPort}`,
+                timeout: timeout,
+                headers: proxy.username && proxy.password
+                    ? {
+                        "Proxy-Authorization": `Basic ${Buffer.from(
+                            `${proxy.username}:${proxy.password}`
+                        ).toString("base64")}`,
+                    }
+                    : {},
+            });
+
+            proxyReq.on("connect", (res, socket) => {
+                if (res.statusCode === 200) {
+                    resolve(socket);
+                } else {
+                    socket.destroy();
+                    reject(
+                        new Error(
+                            `HTTP proxy connection failed with status ${res.statusCode}`
+                        )
+                    );
+                }
+            });
+
+            proxyReq.on("error", (err) => {
+                reject(new Error(`HTTP proxy connection error: ${err.message}`));
+            });
+
+            proxyReq.on("timeout", () => {
+                proxyReq.destroy();
+                reject(new Error("HTTP proxy connection timeout"));
+            });
+
+            proxyReq.end();
+        });
+    }
+
     toString() {
         return "PromisedNetSocket";
     }
