@@ -1,5 +1,5 @@
 {
-  "name": "@kirill-kopylov/telegram",
+  "name": "@kirill_kopylov/telegram",
   "version": "2.26.9",
   "description": "NodeJS/Browser MTProto API Telegram client library with HTTP proxy support (fork of gramjs)",
   "main": "index.js",
@@ -15,7 +15,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/kirill-kopylov/gramjs-http-proxy-support.git"
+    "url": "git+https://github.com/kirill_kopylov/gramjs-http-proxy-support.git"
   },
   "browser": {
     "fs": false

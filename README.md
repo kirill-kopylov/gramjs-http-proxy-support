@@ -23,14 +23,14 @@ Here you'll learn how to obtain necessary information to create telegram applica
 Install this fork:
 
 ```bash
-$ npm install @kirill-kopylov/telegram
+$ npm install @kirill_kopylov/telegram
 ```
 
 Or if migrating from original gramjs:
 
 ```bash
 $ npm uninstall telegram
-$ npm install @kirill-kopylov/telegram
+$ npm install @kirill_kopylov/telegram
 ```
 
 After installation, you'll need to obtain an API ID and hash:
@@ -46,8 +46,8 @@ When you've successfully created the application, change `apiId` and `apiHash` o
 Then run this code to send a message to yourself.
 
 ```javascript
-import { TelegramClient } from "@kirill-kopylov/telegram";
-import { StringSession } from "@kirill-kopylov/telegram/sessions";
+import { TelegramClient } from "@kirill_kopylov/telegram";
+import { StringSession } from "@kirill_kopylov/telegram/sessions";
 import readline from "readline";
 
 const apiId = 123456;
@@ -187,15 +187,17 @@ If your ISP is blocking Telegram, you can check [My ISP blocks Telegram. How can
 
 ## Contributing
 
-This is a fork maintained by [@kirill-kopylov](https://github.com/kirill-kopylov).
+This is a fork maintained by [@kirill_kopylov](https://github.com/kirill_kopylov).
 
-For issues specific to HTTP proxy functionality, please [open an issue here](https://github.com/kirill-kopylov/gramjs-http-proxy-support/issues).
+For issues specific to HTTP proxy functionality, please [open an issue here](https://github.com/kirill_kopylov/gramjs-http-proxy-support/issues).
 
 For general gramjs questions, refer to the [original project](https://github.com/gram-js/gramjs) or their telegram group [@GramJSChat](https://t.me/gramjschat).
 
 ## Syncing with Upstream
 
 This fork is regularly synced with the [original gramjs repository](https://github.com/gram-js/gramjs) to include latest updates and bug fixes.
+
+**Installation:** `npm install @kirill_kopylov/telegram`
 
 ## License
 
